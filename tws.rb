@@ -3,7 +3,7 @@ require './twitter_patches'
 require 'tweetstream'
 require './config'
 require './speak'
-
+require 'net/http'
 
 
 client = TweetStream::Client.new
@@ -36,7 +36,26 @@ end
 #end
 
 def download(status)
-  status.media.map{|m| m.download(folder: status.id.to_s); m.save; puts "file://#{File.expand_path(m.file_path)}" }
+  status.media.each do |m|
+    m.download(folder: status.id.to_s);
+    m.save; 
+    puts "file://#{File.expand_path(m.file_path)}" 
+  end
+  download_to_asset_server(status)
+end
+
+def download_to_asset_server(status)
+  status.media.each do |m|
+    uniq_name= "#{status.id}/#{m.file_name}"
+    uri = URI("http://127.0.0.1:8080")
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      request = Net::HTTP::Post.new uri
+      request.body = "{ \"job_iD\": #{rand(2**30)}, \"uniq_name\": \"#{uniq_name}\", \"src\": \"#{m.media_uri}\" }"
+      response = http.request request # Net::HTTPResponse object
+      puts "upload done: #{response.code}"
+      puts uri.to_s + '/' + uniq_name
+    end
+  end
 end
 
 def show(status, options= {})

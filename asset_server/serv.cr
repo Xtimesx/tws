@@ -17,10 +17,15 @@ class TwitterImageResponse
     status: String,  
   })
 end
+# config #
+server_address = "127.0.0.1"
+server_port = 8080
+folder_prefix = "./tmp/cr/"
+uniq_name_reqex = /^[0-9]+\/[0-9a-zA-Z\-_]+\.(jpg|png)$/
 
-folder_prefix = "tmp/cr/"
+puts "server starting at #{server_address}:#{server_port}"
 
-server = HTTP::Server.new("0.0.0.0", 8080,[HTTP::StaticFileHandler.new("./tmp/cr/", false)]) do |context|
+server = HTTP::Server.new(server_address, server_port, [HTTP::StaticFileHandler.new(folder_prefix, true)]) do |context|
   res, cde = "", 200
   begin
     puts context.request.inspect
@@ -32,7 +37,12 @@ server = HTTP::Server.new("0.0.0.0", 8080,[HTTP::StaticFileHandler.new("./tmp/cr
         if !b.empty?
           job_request = TwitterImageRequest.from_json(b) 
           res += job_request.inspect
+
+          raise "uniq_name invalid" unless job_request.uniq_name =~ uniq_name_reqex
+          raise "src is not twitter image server" unless job_request.src =~ /^https?:\/\/pbs\.twimg\.com\/(media|tweet_video_thumb)\/[0-9a-zA-Z\-_]+\.(jpg|png)$/
+
           command = "curl -XGET '#{job_request.src}' -o #{folder_prefix}#{job_request.uniq_name} --create-dirs -s"
+
     	  raise "Job Failed" unless system(command)
         end
       end

@@ -136,8 +136,12 @@ module Media_save
     path = ['.','image']
     path << options[:folder]
     path = path.join('/')
-    filename = media_uri.to_s.split('/').last
+    filename = file_name
     @file_path ||= "#{path}/#{filename}"
+  end
+
+  def file_name
+    @filename ||= media_uri.to_s.split('/').last
   end
 
   private
