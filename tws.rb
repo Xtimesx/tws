@@ -125,7 +125,7 @@ def show(status, options= {})
   msg = ['']
   case status.class.name
   when 'Twitter::Tweet'
-    msg << (puts status.full_text)
+    msg << (puts status.full_text.gsub('&gt;','>').gsub('&lt;','<').gsub('&amp;','&') )
     say(status.full_text, {lang: status.lang, voice: voiceForUserByName(status.user.screen_name) }) unless status.retweet?
   when 'Twitter::User'
     msg << (puts "#{status.screen_name}/#{status.name}: #{voiceForUserByName(status.screen_name)}")
