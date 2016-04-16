@@ -110,7 +110,8 @@ def download(status)
         response = http.request request # Net::HTTPResponse object
         Thread.current[:code] = response.code
       end
-      Thread.current[:path] = uri.to_s + '/' + uniq_name
+      Thread.current[:uri] = uri.to_s + '/' + uniq_name
+      Thread.current[:path] = "file://#{File.expand_path("./assets/image/#{uniq_name}")}"
     end
   end
 
@@ -147,7 +148,7 @@ def show_with_context(status, options= {})
   msg
 end
 
-
+#system("./serv &") 
 while true do
   begin
     puts "run client"
