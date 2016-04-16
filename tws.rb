@@ -4,7 +4,59 @@ require 'tweetstream'
 require './config'
 require './speak'
 require 'net/http'
+require "observer"
+require 'rack/stream'
+#use Rack::Stream
+class ObservableMessage
+  include Observable
 
+  def initialize(msg)
+    @message = msg
+  end
+
+  def push(message)
+    @message = message
+    changed
+    notify_observers(message)
+  end
+
+  def message
+    @message
+  end
+end
+
+#class App
+#  include Rack::Stream::DSL
+#
+#  def initialize(msg)
+#    @msg = msg
+#    msg.add_observer(self)
+#  end
+#
+#  def update(msg)
+#    @msg = msg
+#  end
+#
+#  stream do
+#    after_open do
+#      count = 0
+#      @timer = EM.add_periodic_timer(1) do
+#        if msg.changed?
+#          chunk msg.message
+#        end
+#      end
+#    end
+#
+#    before_close do
+#      @timer.cancel
+#      chunk "bye!\n"
+#    end
+#
+#    [200, {'Content-Type' => 'text/plain'}, []]
+#  end
+#end
+
+message = ObservableMessage.new("Hello")
 
 client = TweetStream::Client.new
 
@@ -21,8 +73,7 @@ client.on_timeline_status do |status|
   download status
   puts "#" * @cols
   status.save
-  #puts "saved"
-  show_with_context status, depth: 10
+  message.push(show_with_context(status, depth: 10))
 end
 
 
@@ -59,33 +110,34 @@ def download_to_asset_server(status)
 end
 
 def show(status, options= {})
+  msg = ['']
   case status.class.name
   when 'Twitter::Tweet'
-    puts status.full_text
+    msg << (puts status.full_text)
     say(status.full_text, {lang: status.lang, voice: voiceForUserByName(status.user.screen_name) }) unless status.retweet?
   when 'Twitter::User'
-    puts "#{status.screen_name}/#{status.name}: #{voiceForUserByName(status.screen_name)}"
-    puts status.description
-    puts status.location
-   # puts status.inspect
+    msg << (puts "#{status.screen_name}/#{status.name}: #{voiceForUserByName(status.screen_name)}")
+    msg << (puts status.description)
+    msg << (puts status.location)
   else
     puts status.class.name
     status.inspect
   end
+  msg.join("\r\n")
 end
 
 def show_with_context(status, options= {})
+  msg = ['']
   context = status.load_context depth: 10
   context.each do |tweet|
-    show tweet
+    msg << show(tweet)
     puts "~" * @cols
   end
-
+  msg
 end
 
-puts "init complete"
-run = true
-while run do
+
+while true do
   begin
     puts "run client"
     client.userstream
