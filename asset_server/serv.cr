@@ -18,14 +18,14 @@ class TwitterImageResponse
   })
 end
 # config #
-ENV["server_address"] ||= "127.0.0.1"
-ENV["server_port"] ||= "8080"
-ENV["folder_prefix"] ||= "./assets/image/"
+ENV["SERVERADDRESS"] ||= "127.0.0.1"
+ENV["SERVERPORT"] ||= "8080"
+ENV["FOLDERPREFIX"] ||= "./assets/image/"
 uniq_name_reqex = /^[0-9]+\/[0-9a-zA-Z\-_]+\.(jpg|png)$/
 
-puts "server starting at #{ENV["server_address"]}:#{ENV["server_port"]}"
+puts "server starting at #{ENV["SERVERADDRESS"]}:#{ENV["SERVERPORT"]}"
 
-server = HTTP::Server.new(ENV["server_address"], ENV["server_port"].to_i, [HTTP::StaticFileHandler.new(ENV["folder_prefix"], true)]) do |context|
+server = HTTP::Server.new(ENV["SERVERADDRESS"], ENV["SERVERPORT"].to_i, [HTTP::StaticFileHandler.new(ENV["FOLDERPREFIX"], true)]) do |context|
   res, cde = "", 200
   begin
     puts context.request.inspect
@@ -41,7 +41,7 @@ server = HTTP::Server.new(ENV["server_address"], ENV["server_port"].to_i, [HTTP:
           raise "uniq_name invalid" unless job_request.uniq_name =~ uniq_name_reqex
           raise "src is not twitter image server" unless job_request.src =~ /^https?:\/\/pbs\.twimg\.com\/(media|tweet_video_thumb)\/[0-9a-zA-Z\-_]+\.(jpg|png)$/
 
-          command = "curl -XGET '#{job_request.src}' -o #{ENV["folder_prefix"]}#{job_request.uniq_name} --create-dirs -s"
+          command = "curl -XGET '#{job_request.src}' -o #{ENV["FOLDERPREFIX"]}#{job_request.uniq_name} --create-dirs -s"
 
     	  raise "Job Failed" unless system(command)
         end
