@@ -86,26 +86,37 @@ end
 #  show_with_context status, depth: 10
 #end
 
-def download(status)
-  status.media.each do |m|
-    m.download(folder: status.id.to_s);
-    m.save; 
-    puts "file://#{File.expand_path(m.file_path)}" 
-  end
-  download_to_asset_server(status)
-end
+#def download(status)
+#  threads = []
+#  threads << Thread.new(status) do |status|
+#    status.media.each do |m|
+#      m.download(folder: status.id.to_s);
+#      m.save; 
+#      Thread.current[:path] = "file://#{File.expand_path(m.file_path)}" 
+#    end
+#  end
+#  download_to_asset_server(status)
+#end
 
-def download_to_asset_server(status)
+def download(status)
+  threads = []
   status.media.each do |m|
-    uniq_name= "#{status.id}/#{m.file_name}"
-    uri = URI("http://127.0.0.1:8080")
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      request = Net::HTTP::Post.new uri
-      request.body = "{ \"job_iD\": #{rand(2**30)}, \"uniq_name\": \"#{uniq_name}\", \"src\": \"#{m.media_uri}\" }"
-      response = http.request request # Net::HTTPResponse object
-      puts "upload done: #{response.code}"
-      puts uri.to_s + '/' + uniq_name
+    threads << Thread.new(status) do |status|
+      uniq_name= "#{status.id}/#{m.file_name}"
+      uri = URI("http://127.0.0.1:8080")
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        request = Net::HTTP::Post.new uri
+        request.body = "{ \"job_iD\": #{rand(2**30)}, \"uniq_name\": \"#{uniq_name}\", \"src\": \"#{m.media_uri}\" }"
+        response = http.request request # Net::HTTPResponse object
+        Thread.current[:code] = response.code
+      end
+      Thread.current[:path] = uri.to_s + '/' + uniq_name
     end
+  end
+
+  threads.each do |t|
+    t.join
+    puts "#{t[:code]} for: #{t[:path]}"
   end
 end
 
