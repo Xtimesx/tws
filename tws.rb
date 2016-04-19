@@ -102,7 +102,7 @@ def download(status)
   threads = []
   status.media.each do |m|
     threads << Thread.new(status) do |status|
-      uniq_name= "#{status.retweeted_status ? status.retweeted_status.id : status.id}/#{m.file_name}"
+      uniq_name= "#{status.retweeted? ? status.retweeted_status.id : status.id}/#{m.file_name}"
       uri = URI("http://127.0.0.1:8080")
       Net::HTTP.start(uri.host, uri.port) do |http|
         request = Net::HTTP::Post.new uri

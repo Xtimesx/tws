@@ -12,19 +12,19 @@ client = TweetStream::Client.new
 
 client.on_timeline_status do |status|
   if status.retweet?
-    puts "~" * 160
-    puts status
+    #puts "~" * 160
+    #puts status
     #puts status.methods - Object.methods
     #puts status.retweeted_status
     #puts status.retweeted_status.class.name
     #puts status.retweeted_status.to_hash
     #puts status.media.first#.to_hash.each{ |k,v| puts "#{v.class.name} :#{k} ##{v}" }
-    puts status.methods - Object.methods
+    #puts status.methods - Object.methods
     #puts "~" * 160
-    #status.user.to_hash.each{ |k,v| puts "#{v.class.name} :#{k}" }
     #status.to_hash.each{ |k,v| puts "#{v.class.name} :#{k} ##{v}" }
+    status.user.to_hash.each{ |k,v| puts "#{v.class.name} :#{k}##{v}" } if status.user.following?
+    #status.user.to_hash.each{ |k,v| puts "#{v.class.name} :#{k}##{v}" } if status.user.following?
     #puts status.user.methods - Object.methods
-  puts "~" * 160
   end
 end
 
