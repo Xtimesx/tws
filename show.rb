@@ -6,7 +6,7 @@ def tag_search(tagname)
   join(:taggings, :status_id => :id).
   join(:tags, taggings__tag_name: :tags__name).
   left_join(:media, :source_status_id => :status__id).
-  where(Sequel.like(:tags__name, "%#{tagname}%")).
+  where(Sequel.like(:tags__name, tagname)).
   order_by(Sequel.desc(:status__db_id)).limit(50)
 end
 

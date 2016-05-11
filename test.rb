@@ -21,8 +21,8 @@ client.on_timeline_status do |status|
     #puts status.media.first#.to_hash.each{ |k,v| puts "#{v.class.name} :#{k} ##{v}" }
     #puts status.methods - Object.methods
     #puts "~" * 160
-    #status.to_hash.each{ |k,v| puts "#{v.class.name} :#{k} ##{v}" }
-    status.user.to_hash.each{ |k,v| puts "#{v.class.name} :#{k}##{v}" } if status.user.following?
+    status.to_hash.each{ |k,v| puts "#{v.class.name} :#{k} ##{v}" }
+    #status.user.to_hash.each{ |k,v| puts "#{v.class.name} :#{k}##{v}" } if status.user.following?
     #status.user.to_hash.each{ |k,v| puts "#{v.class.name} :#{k}##{v}" } if status.user.following?
     #puts status.user.methods - Object.methods
   end

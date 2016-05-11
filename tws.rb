@@ -24,7 +24,7 @@ class ObservableMessage
     @message
   end
 end
-
+@speak = !!ENV["TALK"]
 #class App
 #  include Rack::Stream::DSL
 #
@@ -126,7 +126,7 @@ def show(status, options= {})
   case status.class.name
   when 'Twitter::Tweet'
     msg << (puts status.full_text.gsub('&gt;','>').gsub('&lt;','<').gsub('&amp;','&') )
-    say(status.full_text, {lang: status.lang, voice: voiceForUserByName(status.user.screen_name) }) unless status.retweet?
+    say(status.full_text, {lang: status.lang, voice: voiceForUserByName(status.user.screen_name) }) unless status.retweet? || !@speak
   when 'Twitter::User'
     msg << (puts "#{status.screen_name}/#{status.name}: #{voiceForUserByName(status.screen_name)}")
     msg << (puts status.description)

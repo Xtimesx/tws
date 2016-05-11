@@ -8,7 +8,11 @@ Twitter::Tweet.class_eval do
       data[field] = self.to_hash[field]
     end
     data[:user_id] = user.id
-    retweeted_status.save if retweeted?
+    data[:retweeted] = false
+    if retweeted_status.class.name != 'Twitter::NullObject'
+      retweeted_status.save
+      data[:retweeted] = true
+    end 
     quoted_status.save if quote?
     if dataset.where(id: id).count > 0
       dataset.where(id: id).update data  
@@ -46,7 +50,7 @@ Twitter::Tweet.class_eval do
       fiels = [:id, :text, :created_at, :source,
        :truncated, :in_reply_to_status_id, :in_reply_to_user_id,
         :in_reply_to_screen_name, :is_quote_status,
-        :retweet_count, :favorite_count, :favorited, :retweeted,
+        :retweet_count, :favorite_count, :favorited,
         :possibly_sensitive,:filter_level, :lang, :timestamp_ms]
   end
 
