@@ -5,7 +5,7 @@ require './config'
 require './speak'
 require 'net/http'
 require "observer"
-require 'rack/stream'
+#require 'rack/stream'
 #use Rack::Stream
 class ObservableMessage
   include Observable
@@ -65,7 +65,7 @@ client.on_error do |message|
 end
 
 client.on_direct_message do |direct_message|
-  puts 
+  puts
   puts direct_message.full_text
 end
 
@@ -91,8 +91,8 @@ end
 #  threads << Thread.new(status) do |status|
 #    status.media.each do |m|
 #      m.download(folder: status.id.to_s);
-#      m.save; 
-#      Thread.current[:path] = "file://#{File.expand_path(m.file_path)}" 
+#      m.save;
+#      Thread.current[:path] = "file://#{File.expand_path(m.file_path)}"
 #    end
 #  end
 #  download_to_asset_server(status)
@@ -106,7 +106,13 @@ def download(status)
       uri = URI("http://127.0.0.1:8080")
       Net::HTTP.start(uri.host, uri.port) do |http|
         request = Net::HTTP::Post.new uri
-        request.body = "{ \"job_iD\": #{rand(2**30)}, \"uniq_name\": \"#{uniq_name}\", \"src\": \"#{m.media_uri}\" }"
+        media_uri = case m
+          when Twitter::Media::Video
+            m[:video_info][:variants].select{|v| v[:content_type] == 'video/mp4'}.sort{|b,a| a[:bitrate] <=> b[:bitrate]}.first[:url]
+          else
+            m.media_uri
+          end
+        request.body = "{ \"job_iD\": #{rand(2**30)}, \"uniq_name\": \"#{uniq_name}\", \"src\": \"#{media_uri}\" }"
         response = http.request request # Net::HTTPResponse object
         Thread.current[:code] = response.code
       end
@@ -148,7 +154,7 @@ def show_with_context(status, options= {})
   msg
 end
 
-#system("./serv &") 
+#system("./serv &")
 while true do
   begin
     puts "run client"
