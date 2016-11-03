@@ -12,10 +12,10 @@ Twitter::Tweet.class_eval do
     if retweeted_status.class.name != 'Twitter::NullObject'
       retweeted_status.save
       data[:retweeted] = true
-    end 
+    end
     quoted_status.save if quote?
     if dataset.where(id: id).count > 0
-      dataset.where(id: id).update data  
+      dataset.where(id: id).update data
     else
       dataset.where(id: id).insert data
     end
@@ -27,7 +27,7 @@ Twitter::Tweet.class_eval do
     context = [self]
     last_tweet = self
     depth.times do
-      if last_tweet.in_reply_to_status_id.class.name != 'Twitter::NullObject' 
+      if last_tweet.in_reply_to_status_id.class.name != 'Twitter::NullObject'
         prev_tweet= dataset.where(id: last_tweet.in_reply_to_status_id).first
         if prev_tweet
           break unless prev_tweet
@@ -59,7 +59,7 @@ Twitter::Tweet.class_eval do
   end
 
   def save_taggings
-    hashtags.each do |tag| 
+    hashtags.each do |tag|
       tag.save
       DB["INSER OR IGNORE INTO taggings (tag_name, status_id) VALUES(?,?)", tag.text ,id ]
     end
@@ -145,7 +145,14 @@ module Media_save
   end
 
   def file_name
-    @filename ||= media_uri.to_s.split('/').last
+
+  base_uri = case self
+  when Twitter::Media::Video
+    video_info.variants.select{|v| v[:content_type] == 'video/mp4'}.sort{|b,a| a[:bitrate] <=> b[:bitrate]}.first[:url]
+  else
+    media_uri
+  end
+    @filename ||= base_uri.to_s.split('/').last
   end
 
   private

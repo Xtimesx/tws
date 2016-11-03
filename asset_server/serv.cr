@@ -21,7 +21,7 @@ end
 ENV["SERVERADDRESS"] ||= "127.0.0.1"
 ENV["SERVERPORT"] ||= "8080"
 ENV["FOLDERPREFIX"] ||= "./assets/image/"
-uniq_name_reqex = /^[0-9]+\/[0-9a-zA-Z\-_]+\.(jpg|png)$/
+uniq_name_reqex = /^[0-9]+\/[0-9a-zA-Z\-_]+\.(jpg|png|mp4|webm)$/
 
 puts "server starting at #{ENV["SERVERADDRESS"]}:#{ENV["SERVERPORT"]}"
 
@@ -39,7 +39,7 @@ server = HTTP::Server.new(ENV["SERVERADDRESS"], ENV["SERVERPORT"].to_i, [HTTP::S
           res += job_request.inspect
 
           raise "uniq_name invalid" unless job_request.uniq_name =~ uniq_name_reqex
-          raise "src is not twitter image server" unless job_request.src =~ /^https?:\/\/pbs\.twimg\.com\/(media|tweet_video_thumb|tweet_video|ext_tw_video\/.*)\/[0-9a-zA-Z\-_]+\.(jpg|png|mp4|webm)$/
+          raise "src is not twitter image server" unless job_request.src =~ /^https?:\/\/(pbs|video)\.twimg\.com\/(media|tweet_video_thumb|tweet_video|ext_tw_video\/.*)\/[0-9a-zA-Z\-_]+\.(jpg|png|mp4|webm)$/
 
           command = "curl -XGET '#{job_request.src}' -o #{ENV["FOLDERPREFIX"]}#{job_request.uniq_name} --create-dirs -s"
 
