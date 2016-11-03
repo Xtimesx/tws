@@ -117,7 +117,10 @@ def download(status)
         Thread.current[:code] = response.code
       end
       Thread.current[:uri] = uri.to_s + '/' + uniq_name
-      Thread.current[:path] = "file://#{File.expand_path("./assets/image/#{uniq_name}")}"
+      Thread.current[:path] = "file://#{File.expand_path(folder: m.file_path((status.retweeted? ? status.retweeted_status.id : status.id).to_s))}"
+      if response.code != 500
+        m.save
+      end
     end
   end
 

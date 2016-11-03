@@ -31,6 +31,15 @@ def text_search(text)
   order_by(Sequel.desc(:status__db_id)).limit(50)
 end
 
+def asset_search(text)
+  puts "text: \"#{text}\""
+  DB.from(:status).
+  join(:media, :source_status_id => :status__id).
+  where(Sequel.like(:status__text, "%#{text}%")).
+  group_by(:status__id).
+  order_by(Sequel.desc(:status__db_id)).limit(50)
+end
+
 puts 'tag to search in database'
 search = gets.chomp 
 dataset = case search[0]
@@ -38,6 +47,8 @@ dataset = case search[0]
     tag_search(search[1,search.length])
   when '@'
     user_search(search[1,search.length])
+  when '?'
+    asset_search(search[1,search.length])
   else
     text_search(search)
 end
