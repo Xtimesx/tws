@@ -2,7 +2,7 @@ require './mnt'
 
 DB.create_table :media do
  primary_key :db_id
- Bignum :id #711120424453672961
+ BigInt :id #711120424453672961
  String :media_url #http://pbs.twimg.com/media/Cd5oQiQWEAE2Syk.jpg
  String :media_url_https #https://pbs.twimg.com/media/Cd5oQiQWEAE2Syk.jpg
  String :url #https://t.co/4GmB5yaEI9
@@ -10,14 +10,14 @@ DB.create_table :media do
  String :expanded_url #http://twitter.com/CutieTingz/status/711120424600530944/photo/1
  String :type #photo
  #Hash :sizes #{:medium=>{:w=>337, :h=>450, :resize=>"fit"}, :thumb=>{:w=>150, :h=>150, :resize=>"crop"}, :small=>{:w=>337, :h=>450, :resize=>"fit"}, :large=>{:w=>337, :h=>450, :resize=>"fit"}}
- Bignum :source_status_id #711120424600530944
- Bignum :source_user_id #2309326454
+ BigInt :source_status_id #711120424600530944
+ BigInt :source_user_id #2309326454
 
 end
 
 DB.create_table :status do
   primary_key :db_id
-  BigNum :id, unique: true, null: false
+  BigInt :id, unique: true, null: false
   String :text,  :null => false
   #foreign_key :category_id, :categories
   DateTime :created_at
@@ -25,10 +25,10 @@ DB.create_table :status do
 
   String :source
   FalseClass :truncated
-  BigNum :in_reply_to_status_id
-  BigNum :in_reply_to_user_id
+  BigInt :in_reply_to_status_id
+  BigInt :in_reply_to_user_id
   String :in_reply_to_screen_name
-  BigNum :user_id
+  BigInt :user_id
   #NilClass :contributors
   #Hash :retweeted_status
   FalseClass :is_quote_status
@@ -49,7 +49,7 @@ end
 
 DB.create_table :user do
  primary_key :db_id
- BigNum :id, null: false
+ BigInt :id, null: false
  String :name
  String :screen_name
  String :location
