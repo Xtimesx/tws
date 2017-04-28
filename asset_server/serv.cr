@@ -34,6 +34,7 @@ server = HTTP::Server.new(ENV["SERVERADDRESS"], ENV["SERVERPORT"].to_i, [HTTP::S
       res += context.request.inspect
       if !(b=context.request.body).nil?
         res += "body: #{b.inspect}"
+        b = b.gets_to_end
         if !b.empty?
           job_request = TwitterImageRequest.from_json(b)
           res += job_request.inspect
