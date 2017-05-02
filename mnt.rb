@@ -1,5 +1,5 @@
 require 'sequel'
 
-DB = Sequel.sqlite('my_twitter.db')
+DB = Sequel.postgres('mytwitterdb', host: 'localhost', user: 'postgres', password: 'geminiprojekt12')
 
 
