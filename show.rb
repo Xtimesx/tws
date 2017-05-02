@@ -24,10 +24,9 @@ end
 
 def text_search(text)
   puts "text: \"#{text}\""
-  DB.from(:status).
+  DB.select{status__id.distinct}.from(:status).
   left_join(:media, :source_status_id => :status__id).
   where(Sequel.like(:status__text, "%#{text}%")).
-  group_by(:status__id).
   order_by(Sequel.desc(:status__db_id)).limit(50)
 end
 
