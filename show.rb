@@ -15,11 +15,11 @@ def user_search(username)
   id = DB.from(:user).
   where(Sequel.like(:user__screen_name, "%#{username}%")).
   group_by(:id)
-  #id = id.first[:id]
-  #DB.from(:status).
-  #left_join(:media, :source_status_id => :status__id).
-  #where(status__user_id: id).
-  #order_by(Sequel.desc(:status__db_id)).limit(10)
+  id = id.first[:id]
+  DB.from(:status).
+  left_join(:media, :source_status_id => :status__id).
+  where(status__user_id: id).
+  order_by(Sequel.desc(:status__db_id)).limit(10)
 end
 
 def text_search(text)

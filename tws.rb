@@ -5,6 +5,7 @@ require './config'
 require './speak'
 require 'net/http'
 require "observer"
+require './downloader'
 #require 'rack/stream'
 #use Rack::Stream
 class ObservableMessage
@@ -69,13 +70,15 @@ client.on_direct_message do |direct_message|
   puts direct_message.full_text
 end
 
+
 client.on_timeline_status do |status|
-  download status
+  if defined? Tws && defined? Tws::StatusDownloader
+    puts Tws::StatusDownloader.download status
+  end
   puts "#" * @cols
   status.save
   message.push(show_with_context(status, depth: 10))
 end
-
 
 #client.sitestream([2263321928], :followings => true) do |status|
 #  puts "#" * @cols#
@@ -97,35 +100,6 @@ end
 #  end
 #  download_to_asset_server(status)
 #end
-
-def download(status)
-  threads = []
-  status.media.each do |m|
-    threads << Thread.new(status) do |status|
-      uniq_name= "#{status.retweeted? ? status.retweeted_status.id : status.id}/#{m.file_name}"
-      uri = URI("http://127.0.0.1:8080")
-      Net::HTTP.start(uri.host, uri.port) do |http|
-        request = Net::HTTP::Post.new uri
-        media_uri = case m
-          when Twitter::Media::Video
-            m[:video_info][:variants].select{|v| v[:content_type] == 'video/mp4'}.sort{|b,a| a[:bitrate] <=> b[:bitrate]}.first[:url]
-          else
-            m.media_uri
-          end
-        request.body = "{ \"job_iD\": #{rand(2**30)}, \"uniq_name\": \"#{uniq_name}\", \"src\": \"#{media_uri}\" }"
-        response = http.request request # Net::HTTPResponse object
-        Thread.current[:code] = response.code
-      end
-      Thread.current[:uri] = uri.to_s + '/' + uniq_name
-      Thread.current[:path] = "file://#{File.expand_path("./assets/" + m.file_path(folder: (status.retweeted? ? status.retweeted_status.id : status.id).to_s))}"
-    end
-  end
-
-  threads.each do |t|
-    t.join
-    puts "#{t[:code]} for: #{t[:path]}"
-  end
-end
 
 def show(status, options= {})
   msg = ['']
@@ -158,7 +132,6 @@ end
 while true do
   begin
     puts "run client"
-    client.userstream
     client.userstream
   rescue
     puts "Durr!: #{$!}"
