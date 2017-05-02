@@ -7,8 +7,7 @@ module Tws
       end 
 
       def save
-        data = base_save 
-        dataset.insert data
+        dataset.insert collect_data
       end
  
       def collect_data

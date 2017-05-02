@@ -16,8 +16,12 @@ Twitter::Entity::Hashtag.class_eval do
   def save
     begin
       #puts dataset.where(name: text).count
-      unless dataset.where(name: text).count > 0
-        dataset.insert(name: text)
+      if DB.database_type == :postgres
+        unless dataset.where(name: text).count > 0
+          dataset.insert(name: text)
+        end
+      elsif DB.database_type == :sqlite
+        dataset.insert_ignore.insert(name: text)
       end
     rescue Sequel::UniqueConstraintViolation
       puts "error while saving ##{text}" unless dataset.where(name: text).count == 1
@@ -30,13 +34,7 @@ Twitter::Entity::Hashtag.class_eval do
 end
 
 Twitter::User.class_eval do
-  def save
-    data = {}
-    fields.each do |field|
-      data[field] = self.to_hash[field]
-    end
-    dataset.insert data
-  end
+  include Tws::TwitterPatches::Base
   private
   def dataset
     dataset = DB.from(:user)

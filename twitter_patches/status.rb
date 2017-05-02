@@ -14,10 +14,14 @@ module Tws
         end
         quoted_status.save if quote?
         begin
-          if dataset.where(id: id).count > 0
-            dataset.where(id: id).update data
-          else
-            dataset.where(id: id).insert data
+          DB.database_type == :postgres
+            if dataset.where(id: id).count > 0
+              dataset.where(id: id).update data
+            else
+              dataset.where(id: id).insert data
+            end
+          elsif DB.database_type == :sqlite
+            dataset.insert_conflict(:replace).insert data
           end
           save_taggings
         rescue Sequel::UniqueConstraintViolation
@@ -64,7 +68,11 @@ module Tws
       def save_taggings
         hashtags.each do |tag|
           tag.save
-          DB["INSER OR IGNORE INTO taggings (tag_name, status_id) VALUES(?,?)", tag.text ,id ]
+          if DB.database_type == :postgres
+            DB["INSER OR IGNORE INTO taggings (tag_name, status_id) VALUES(?,?)", tag.text ,id ]
+          elsif DB.database_type == :sqlite
+            DB[:taggings].insert_ignore.insert tag_name: tag.text, status_id: id
+          end
         end
       end
     end
