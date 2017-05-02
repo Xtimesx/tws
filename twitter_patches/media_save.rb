@@ -29,13 +29,16 @@ module Tws
         @file_path ||= "#{path}/#{filename}"
       end
 
-      def file_name
-        base_uri = case self
+      def base_uri
+        case self
         when Twitter::Media::Video
           video_info.variants.select{|v| v.content_type == 'video/mp4'}.sort{|b,a| a.bitrate <=> b.bitrate}.first[:url]
         else
           media_uri
         end
+      end
+
+      def file_name
           @filename ||= base_uri.to_s.split('/').last
       end
 
