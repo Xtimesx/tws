@@ -1,6 +1,6 @@
 require './mnt'
 require 'uri'
-
+class DescriptionParser
 def parse_tokens(string)
   # split after urls 
   regexp = /[🔥🌿🏓;♥️✪♡／|•☾✚★∆✗\{\}\(\)\]\[]|[.!? ] | [\/ :]{2,} | [~*·\-\/,] |\r\n|\n/
@@ -74,35 +74,23 @@ def tokens_to_mappings(tokens)
 # implement lists in language, list:
 # one, two and three
 mts = tokens.map{ |k,t|
-  puts'k',k,'t',t 
   [k,string_to_mappings(t)]
 }.to_h
-#mts = mts.select{ |k,v| v && v.any? }
-puts mts.inspect
-#mts=mts.map{|k,v|
-# [k, v]
-#}.to_h
 mts
 end
-
+end
 descriptions = {}
-DB.from(:user).order_by(:db_id).limit(100).where("description IS NOT NULL").map{|d| descriptions[d[:screen_name]] = "#{d[:description]} \r\n #{ descriptions[d[:screen_name]]}" }
+DB.from(:user).group_by(:description).order_by(:db_id).limit(100000).where("description IS NOT NULL").map{|d| descriptions[d[:screen_name]] = "#{d[:description]} \r\n #{ descriptions[d[:screen_name]]}" }
 #tokens = descriptions.select{|k,d| d }.map{ |k,d| t=d.split(/[♥️✪|•☾✚∆✗]|[.!?] | \/\/ | [-\/] |\r\n|\n/).map(&:strip); puts t.inspect ;[k,t] }
 #tokens = descriptions.select{|k,d| d }.map{ |k,d| t=d.split(/[♥️✪|•☾✚∆✗]|[.!?] | \/\/ | [-\/,] |\r\n|\n/).map(&:strip); puts t.inspect ;[k,t] }
 #tokens = descriptions.select{|k,d| d }.map{ |k,d| t=d.split(/[♥️✪|•☾✚∆✗]|[.!?] | [\/ ]{2} | [-\/,] |\r\n|\n/).map(&:strip); puts t.inspect ;[k,t] }
+p= DescriptionParser.new
 tokens = descriptions.select{|k,d| d }.map{ |k,d|
-  [k,parse_tokens(d)] 
+  [k,p.parse_tokens(d)] 
 }
 
 tokens = tokens.to_h
-mts = tokens_to_mappings(tokens)
-
-puts 'mts.inspect', mts.inspect
-#tokens.each{ |k,v| 
-#  puts k.rjust(30,'~'), v.map{ |m,n| 
-#    "#{m.ljust(40)} #{n}"
-#  } 
-#}
+mts = p.tokens_to_mappings(tokens)
 
 #mts.each{ |k,v| puts k, v.map{|m,n| "#{m}: \t #{n}"} };nil
 #mts.each{ |k,v| puts k.rjust(30,'~'), v.map{|m,n| "#{m.ljust(40)} #{n}"} };nil
