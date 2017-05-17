@@ -14,7 +14,7 @@ module Tws
         end
         quoted_status.save if quote?
         begin
-          DB.database_type == :postgres
+          if DB.database_type == :postgres
             if dataset.where(id: id).count > 0
               dataset.where(id: id).update data
             else
@@ -70,10 +70,9 @@ module Tws
           tag.save
           if DB.database_type == :postgres
             DB["INSER OR IGNORE INTO taggings (tag_name, status_id) VALUES(?,?)", tag.text ,id ]
-          elsif DB.database_type == :sqlite
+          else DB.database_type == :sqlite
             DB[:taggings].insert_ignore.insert tag_name: tag.text, status_id: id
           end
-
         end
       end
     end
