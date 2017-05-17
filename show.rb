@@ -13,11 +13,12 @@ end
 
 def user_search(username)
   puts "user: @#{username}"
-  user = DB.from(:user).
+  id = DB.select("*, db_id").from(:user).
   where(Sequel.like(:user__screen_name, "%#{username}%")).
   group_by(:id).first
   id = user[:id]
   tweet_times_table_for(user[:screen_name])
+
   DB.from(:status).
   left_join(:media, :source_status_id => :status__id).
   where(status__user_id: id).

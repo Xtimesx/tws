@@ -26,6 +26,7 @@ tokens = descriptions.select{|k,d| d }.map.inject({}){ |r,kd|
 mts = p.tokens_to_mappings(tokens)
 puts 'done breaking down data after:', Time.now - t, "with #{mts.length} users"
 # puts 'mts.inspect', mts.inspect
+
 #tokens.each{ |k,v| 
 #  puts k.rjust(30,'~'), v.map{ |m,n| 
 #    "#{m.ljust(40)} #{n}"

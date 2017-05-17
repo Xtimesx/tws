@@ -35,7 +35,7 @@ module Tws
     end
 
     def self.status_id status
-      (status.retweeted? ? status.retweeted_status.id : status.id).to_s(16).upcase.scan(/../).join('/')
+      (status.retweeted_status? ? status.retweeted_status.id : status.id).to_s(16).upcase.scan(/../).join('/')
     end
   end
 end

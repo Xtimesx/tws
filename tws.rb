@@ -80,6 +80,7 @@ client.on_timeline_status do |status|
   message.push(show_with_context(status, depth: 10))
 end
 
+
 def show(status, options= {})
   msg = ['']
   case status.class.name

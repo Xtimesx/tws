@@ -1,7 +1,5 @@
 require './mnt'
 
-Sequel.migration do
-  alter_table :status do
+  DB.alter_table :status do
     drop_constraint(:text, :type=>:unique)
   end
-end
