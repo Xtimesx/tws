@@ -1,4 +1,5 @@
 require './mnt'
+require './user_time_scanner'
 
 def tag_search(tagname)
   puts "tag: ##{tagname}"
@@ -12,10 +13,11 @@ end
 
 def user_search(username)
   puts "user: @#{username}"
-  id = DB.from(:user).
+  user = DB.from(:user).
   where(Sequel.like(:user__screen_name, "%#{username}%")).
-  group_by(:id)
-  id = id.first[:id]
+  group_by(:id).first
+  id = user[:id]
+  tweet_times_table_for(user[:screen_name])
   DB.from(:status).
   left_join(:media, :source_status_id => :status__id).
   where(status__user_id: id).
