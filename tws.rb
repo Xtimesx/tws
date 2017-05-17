@@ -80,16 +80,6 @@ client.on_timeline_status do |status|
   message.push(show_with_context(status, depth: 10))
 end
 
-#client.sitestream([2263321928], :followings => true) do |status|
-#  puts "#" * @cols#
-
-#  download status
-#  status.save
-#  #puts "saved"
-#  show_with_context status, depth: 10
-#end
-
-
 
 def show(status, options= {})
   msg = ['']

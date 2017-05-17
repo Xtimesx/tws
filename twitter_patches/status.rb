@@ -73,6 +73,7 @@ module Tws
           elsif DB.database_type == :sqlite
             DB[:taggings].insert_ignore.insert tag_name: tag.text, status_id: id
           end
+
         end
       end
     end

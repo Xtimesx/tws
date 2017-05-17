@@ -23,6 +23,7 @@ Twitter::Entity::Hashtag.class_eval do
       elsif DB.database_type == :sqlite
         dataset.insert_ignore.insert(name: text)
       end
+
     rescue Sequel::UniqueConstraintViolation
       puts "error while saving ##{text}" unless dataset.where(name: text).count == 1
     end
