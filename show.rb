@@ -13,7 +13,7 @@ end
 
 def user_search(username)
   puts "user: @#{username}"
-  user = DB.from(:user).
+  id = DB.select("*, db_id").from(:user).
   where(Sequel.like(:user__screen_name, "%#{username}%")).
   group_by(:id).first
   id = user[:id]
