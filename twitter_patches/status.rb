@@ -6,6 +6,7 @@ module Tws
       def save
         user.save
         data = collect_data
+        data[:text] = full_text
         data[:user_id] = user.id
         data[:retweeted] = false
         if retweeted_status.present?
@@ -51,6 +52,12 @@ module Tws
         context.compact.reverse
       end
 
+      def full_text
+        self.to_h[:extended_tweet][:full] ||  
+        self.to_h[:extended_tweet][:full_text] 
+        rescue e 
+          super
+      end
       private
 
       def fields
