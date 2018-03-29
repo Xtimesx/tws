@@ -9,10 +9,7 @@ require './twitter_patches'
 # Copyright: Hiroshi Ichikawa <http://gimite.net/en/>
 # Lincense: New BSD Lincense
 
-def init_bunny
-
-  end
-
+#https://github.com/gimite/web-socket-ruby/blob/master/samples/chat_server.rb
 $LOAD_PATH << File.dirname(__FILE__) + "/../lib"
 require "web_socket"
 require "thread"
@@ -72,40 +69,3 @@ server.run() do |ws|
     puts("Connection closed")
   end
 end
-
-
-
-class Server
-  def initialize( port, ip )
-    @server = TCPServer.open( ip, port )
-    @connections = Hash.new
-    @rooms = Hash.new
-    @clients = Hash.new
-    @connections[:server] = @server
-    @connections[:rooms] = @rooms
-    @connections[:clients] = @clients
-    @q = nil
-    run
-
-  end
-
-  
-
-  def run
-    loop {
-      Thread.start(@server.accept) do | client |
-        nick_name = client.gets.chomp.to_sym
-        @connections[:clients].each do |other_name, other_client|
-          if nick_name == other_name || client == other_client
-            client.puts "This username already exist"
-            Thread.kill self
-          end
-        end
-        puts "#{nick_name} #{client}"
-        @connections[:clients][nick_name] = client
-      end
-    }.join
-  end
-end
-
-Server.new( 3000, "localhost" )
